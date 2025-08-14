@@ -29,7 +29,8 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonInputScreen(
-   viewModel: PersonViewModel = koinViewModel()
+   viewModel: PersonViewModel = koinViewModel(),
+   validator: PersonValidator = koinInject<PersonValidator>(),
 ) {
    val tag = "<-PersonInputScreen"
 
@@ -43,19 +44,23 @@ fun PersonInputScreen(
          TopAppBar(
             title = { Text(text = stringResource(R.string.personInput)) },
             navigationIcon = {
-               IconButton(onClick = { logDebug(tag,"navigateUp") }) {
+               IconButton(onClick = {
+                  if(viewModel.validate()) {
+                     viewModel.onProcessPersonIntent(PersonIntent.Create)
+                     logDebug(tag, "navigateUp")
+                  }
+               }) {
                   Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                      contentDescription = stringResource(R.string.back))
                }
             }
-         )
-      },
+      )},
       modifier = Modifier.fillMaxSize()
    ) { innerPadding ->
 
       PersonContent(
          personUiState = personUiState,
-         validator = koinInject<PersonValidator>(),
+         validator = validator,
          onFirstNameChange = {
             viewModel.onProcessPersonIntent(PersonIntent.FirstNameChange(it))
          },

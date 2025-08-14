@@ -32,7 +32,8 @@ import org.koin.compose.koinInject
 @Composable
 fun PersonDetailScreen(
    id: String,
-   viewModel: PersonViewModel
+   viewModel: PersonViewModel = koinInject<PersonViewModel>(),
+   validator: PersonValidator = koinInject<PersonValidator>(),
 ) {
    val tag = "<-PersonDetailScreen"
 
@@ -65,7 +66,7 @@ fun PersonDetailScreen(
 
       PersonContent(
          personUiState = personUiState,
-         validator = koinInject<PersonValidator>(),
+         validator = validator,
          onFirstNameChange = {
             viewModel.onProcessPersonIntent(PersonIntent.FirstNameChange(it)) },
          onLastNameChange = {

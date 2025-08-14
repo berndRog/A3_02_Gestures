@@ -17,15 +17,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,12 +53,9 @@ fun PeopleListScreen(
       viewModel.onProcessPeopleIntent(PeopleIntent.Fetch)
    }
 
-   val snackbarHostState = remember { SnackbarHostState() }
-
    Scaffold(
       contentColor = MaterialTheme.colorScheme.onBackground,
       contentWindowInsets = WindowInsets.safeDrawing, // .safeContent .safeGestures
-      modifier = Modifier.fillMaxSize(),
       topBar = {
          TopAppBar(
             title = { Text(stringResource(R.string.peopleList)) },
@@ -89,14 +82,7 @@ fun PeopleListScreen(
             Icon(Icons.Default.Add, "Add a contact")
          }
       },
-      snackbarHost = {
-         SnackbarHost(hostState = snackbarHostState) { data ->
-            Snackbar(
-               snackbarData = data,
-               actionOnNewLine = true
-            )
-         }
-      }
+      modifier = Modifier.fillMaxSize(),
    ) { innerPadding ->
 
       LazyColumn(
@@ -111,16 +97,17 @@ fun PeopleListScreen(
             logDebug(tag, "Person: ${person.firstName} ${person.lastName}")
             SwipePersonListItem(
                person = person,                        // item
-               onNavigate = {                          // navigate to DetailScreen
+               onEdit = {                              // edit item: navigate to DetailScreen
+                  logDebug(tag, "Edit person: ${person.firstName} ${person.lastName}")
                   onNavigatePersonDetail(person.id)
                },
-               onProcessIntent = {                     // remove item
-                  viewModel.onProcessPersonIntent(PersonIntent.Remove(person))
+               onDelete = {                            // delete item
+                  logDebug(tag, "Delete person: ${person.firstName} ${person.lastName}")
+                  //viewModel.onProcessPersonIntent(PersonIntent.Remove(person))
                },
-               onErrorEvent = {}, //viewModel::handleErrorEvent,   // undo -> show snackbar
-               onUndoAction = {                       // undo -> action
-                  viewModel.onProcessPersonIntent(PersonIntent.Undo)
-               }
+               onUndo = {                             // handle undo action
+                  logDebug(tag, "Restore person")
+               },
             ) {
                PersonCard(
                   firstName = person.firstName,

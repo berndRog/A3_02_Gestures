@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import de.rogallab.mobile.ui.base.BaseActivity
+import de.rogallab.mobile.ui.people.composables.input_detail.PersonDetailScreen
+import de.rogallab.mobile.ui.people.composables.input_detail.PersonInputScreen
 import de.rogallab.mobile.ui.people.composables.list.PeopleListScreen
 import de.rogallab.mobile.ui.theme.AppTheme
 
