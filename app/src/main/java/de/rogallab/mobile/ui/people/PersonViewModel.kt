@@ -162,7 +162,8 @@ class PersonViewModel(
       _repository.getAll()
          .onSuccess { people ->
             _peopleUiStateFlow.update { it: PeopleUiState ->
-               it.copy(people = people ?: emptyList())
+               it.copy(people = emptyList())
+               it.copy(people = people)
             }
          }
          .onFailure { logError(TAG, it.message ?: "Error in fetch") }
