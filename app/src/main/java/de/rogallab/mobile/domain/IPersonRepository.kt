@@ -4,13 +4,13 @@ import de.rogallab.mobile.domain.entities.Person
 
 interface IPersonRepository {
 
-    fun getAll(): ResultData<List<Person>>
-    fun getWhere(predicate: (Person) -> Boolean): ResultData<List<Person>>
-    fun getById(id: String): ResultData<Person?>
-    fun getBy(predicate: (Person) -> Boolean): ResultData<Person?>
+    fun getAll(): Result<List<Person>>
+    fun getWhere(predicate: (Person) -> Boolean): Result<List<Person>>
+    fun findById(id: String): Result<Person?>
+    fun findBy(predicate: (Person) -> Boolean): Result<Person?>
 
-    fun create(person: Person): ResultData<Unit>
-    fun update(person: Person): ResultData<Unit>
-    fun remove(person: Person): ResultData<Unit>
+    fun create(person: Person): Result<Unit>
+    fun update(person: Person): Result<Unit>
+    fun remove(person: Person): Result<Unit>
 
 }

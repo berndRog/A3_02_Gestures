@@ -7,62 +7,60 @@ import de.rogallab.mobile.domain.entities.Person
 
 class PersonRepository(
    private val _dataStore: IDataStore
-): IPersonRepository {
-
-   override fun getAll(): ResultData<List<Person>> =
+) : IPersonRepository {
+   override fun getAll(): Result<List<Person>> =
       try {
-         ResultData.Success(_dataStore.selectAll())
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(_dataStore.selectAll())
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 
    override fun getWhere(
       predicate: (Person) -> Boolean
-   ): ResultData<List<Person>> =
+   ): Result<List<Person>> =
       try {
-         ResultData.Success(_dataStore.selectWhere(predicate))
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(_dataStore.selectWhere(predicate))
+      } catch (e: Throwable) {
+         Result.failure(e)
       }
 
-   override fun getById(id: String): ResultData<Person?> =
+   override fun findById(id: String): Result<Person?> =
       try {
-//       throw RuntimeException("TEST throw not implemented")
-         ResultData.Success(_dataStore.findById(id))
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(_dataStore.findById(id))
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 
-   override fun getBy(
+   override fun findBy(
       predicate: (Person) -> Boolean
-   ): ResultData<Person?> =
+   ): Result<Person?> =
       try {
-         ResultData.Success(_dataStore.findBy(predicate))
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(_dataStore.findBy(predicate))
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 
-   override fun create(person: Person): ResultData<Unit> =
+   override fun create(person: Person): Result<Unit> =
       try {
          _dataStore.insert(person)
-         ResultData.Success(Unit)
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(Unit)
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 
-   override fun update(person: Person): ResultData<Unit> =
+   override fun update(person: Person): Result<Unit> =
       try {
          _dataStore.update(person)
-         ResultData.Success(Unit)
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(Unit)
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 
-   override fun remove(person: Person): ResultData<Unit> =
+   override fun remove(person: Person): Result<Unit> =
       try {
          _dataStore.delete(person)
-         ResultData.Success(Unit)
-      } catch (t: Throwable) {
-         ResultData.Error(t)
+         Result.success(Unit)
+      } catch (e: Exception) {
+         Result.failure(e)
       }
 }

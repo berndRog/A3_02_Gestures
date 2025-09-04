@@ -74,55 +74,48 @@ class PersonViewModel(
    }
 
    private fun fetchById(id: String) {
-      logDebug(TAG, "fetchPersonById: $id")
-      when (val resultData = _repository.getById(id)) {
-         is ResultData.Success -> {
+      logDebug(TAG, "fetchById() $id")
+      _repository.findById(id)
+         .onSuccess { person ->
             _personUiStateFlow.update { it: PersonUiState ->
-               it.copy(person = resultData.data ?: Person(id = newUuid()))  // new UiState
+               it.copy(person = person ?: Person()) // if null, create an empty
             }
          }
-         is ResultData.Error ->
-            logError(TAG, resultData.throwable.message ?: "Error fetchById")
-      }
+         .onFailure { logError(TAG, it.message ?: "Error in fetchById") }
    }
+
    private fun create() {
       logDebug(TAG, "createPerson")
-      when (val resultData = _repository.create(_personUiStateFlow.value.person)) {
-         is ResultData.Success -> {}
-         is ResultData.Error ->
-            logError(TAG, resultData.throwable.message ?: "Error in create")
-      }
+      _repository.create(_personUiStateFlow.value.person)
+         .onSuccess { fetch() } // reread all people
+         .onFailure { logError(TAG, it.message ?: "Error in create") }
    }
+
    private fun update() {
-      logDebug(TAG, "updatePerson")
-      when (val resultData = _repository.update(_personUiStateFlow.value.person)) {
-         is ResultData.Success -> {}
-         is ResultData.Error ->
-            logError(TAG, resultData.throwable.message ?: "Error in update")
-      }
+      logDebug(TAG, "updatePerson()")
+      _repository.update(_personUiStateFlow.value.person)
+         .onSuccess { fetch() } // reread all people
+         .onFailure { logError(TAG, it.message ?: "Error in update") }
    }
 
    private var removedPerson: Person? = null
    private fun remove(person: Person) {
+      logDebug(TAG, "removePerson()")
       removedPerson = person
-      logDebug(TAG, "removePerson: $person")
-      when (val resultData = _repository.remove(person)) {
-         is ResultData.Success -> {}
-         is ResultData.Error ->
-            logError(TAG, resultData.throwable.message ?: "Error in remove")
-      }
+      _repository.remove(person)
+         .onSuccess { fetch() } // reread all people
+         .onFailure { logError(TAG, it.message ?: "Error in remove") }
    }
+
    private fun undoRemove() {
       removedPerson?.let { person ->
          logDebug(TAG, "undoRemovePerson: ${person.id.as8()}")
-         when(val resultData = _repository.create(person)) {
-            is ResultData.Success -> {
+         _repository.create(person)
+            .onSuccess {
                removedPerson = null
                fetch()
             }
-            is ResultData.Error ->
-               logError(TAG, resultData.throwable.message ?: "Error in undoRemove")
-         }
+            .onFailure { logError(TAG, it.message ?: "Error in undoRemove") }
       }
    }
 
@@ -163,25 +156,18 @@ class PersonViewModel(
       }
    }
 
+   // read all people from repository
    private fun fetch() {
-      when (val resultData = _repository.getAll()) {
-         is ResultData.Success -> {
-            logDebug(TAG, "fetch() people.size: ${resultData.data.size}")
+      logDebug(TAG, "fetch")
+      _repository.getAll()
+         .onSuccess { people ->
             _peopleUiStateFlow.update { it: PeopleUiState ->
-
-               if(it.people.toList() == resultData.data.toList()) {
-                  // clear existing list
-                  logDebug(TAG, "fetch() no changes, skipping update")
-               }
-               it.copy(people = resultData.data.toList())
+               it.copy(people = people ?: emptyList())
             }
          }
-         is ResultData.Error ->
-            logError(TAG, resultData.throwable.message ?: "Error fetch")
-      }
+         .onFailure { logError(TAG, it.message ?: "Error in fetch") }
    }
    // endregion
-
 
    companion object {
       private const val TAG = "<-PersonViewModel"
